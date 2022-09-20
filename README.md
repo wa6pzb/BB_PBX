@@ -4,7 +4,6 @@ This is the construction of a simple telephone Private Branch Exchange (PBX) usi
 
 ## Block Diagram
 
-![This is an image] (images/BB-PBX.png)
-![Alt text](images/BB-PBX.png?raw=true "Title")
+![Alt text](images/BB-PBX.png?raw=true "Block Diagram")
 
 Micromite - https://geoffg.net/micromite.html
