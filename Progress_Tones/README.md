@@ -10,4 +10,4 @@ The audio player needs the files named like:
 
 ...
 
-Using the data interface on the player the files can be played by putting the binary representation of the the file name on the bus.
+Using the data interface on the player the files can be played by putting the binary representation of the the number of the file name on the bus.
