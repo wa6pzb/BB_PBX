@@ -2,7 +2,7 @@
   pbx2
 '
 Sub pbx2
-  header$=" BB_PBX-INFO-v2.04- "
+  header$=" BB_PBX-INFO-v2.22268- "
   m_loop=0
   call_1=0
   Dim nums(10)
@@ -16,24 +16,24 @@ Sub pbx2
   SetPin 15, dout
   SetPin 16, dout
   Do
-    get_hook_state
-    If hook_state=1 And call_1=0 Then
+    get_hook_state_line_1
+    If hook_state_line_1=1 And call_1=0 Then
       Print Time$;header$;"Line 1 offhook"
       play_dailtone
       get_number
       process_call
     End If
-    If hook_state=0 And call_1=1 Then
+    If hook_state_line_1=0 And call_1=1 Then
       Print Time$;header$;"Line 1 End call ext"; number
       call_1=0
       play_silence
       flash(9)
     End If
-    If hook_state=0 And call_1=0 Then
+    If hook_state_line_1=0 And call_1=0 Then
       play_silence
       flash(9)
     End If
-    If hook_state=1 And call_1=1 Then
+    If hook_state_line_1=1 And call_1=1 Then
       flash(9)
     End If
     If m_loop=1200 Then
@@ -78,15 +78,21 @@ Sub call_line_1
 End Sub
 '
 Sub call_line_2
+Print Time$;header$;"Line 1 Calling call ext"; number
 ring_line_2
 Timer =0
   Do
     If Timer > 2000 Then
+     Print Time$;header$;"Line 1 Calling call ext"; number
      ring_line_2
      If Pin(7)=1 Then Exit Sub
      Timer =0
     End If
-    If Pin(7)=1 Then Exit Sub
+    If Pin(4)=0 Then Exit Sub
+    If Pin(7)=1 Then
+     Print Time$;header$;"Line 1 connected to ext"; number
+     Exit Sub
+    End If
   Loop
 End Sub
 Sub hook
@@ -130,14 +136,16 @@ Sub rotary2
       EndIf
     EndIf
     lastState=reading
-    If digits=2 Then play_silence
-    If digits=5 Then Exit Sub
-'If number=1234 Then Exit Sub
+    If digits=2 Then
+     play_silence
+     Exit Sub
+     End If
+    'If digits=5 Then Exit Sub
     If Timer - lastStateChangeTime > 2500 And Pin(4)=0 Then
       call_1=0
       Exit Sub
     End If
-    If Timer >= 15000 Then
+    If Timer >= 8000 Then
       play_offhook
       Pause 5000
       Print Time$;header$;"call timeout"
@@ -156,8 +164,8 @@ Sub flash(nbr)
   Pause 250
 End Sub
 '
-Sub get_hook_state
-  hook_state=Pin(4)
+Sub get_hook_state_line_1
+  hook_state_line_1=Pin(4)
 End Sub
 '
 Sub get_number
@@ -166,20 +174,29 @@ End Sub
 '
 Sub process_call
   If Pin(4)=0 And call_1=0 Then Exit Sub
-  If number=1234 Then
+  If number=9000 Then
     Print Time$;header$;"Line 1 in call to ext";number
     call_1=1
     Pause 2000
     play_ringing
     Pause 7000
     play_music
-  Else
+    Exit Sub
+  End If
+  If number=2000 Then
+    Print Time$;header$;"Line 1 in call to ext";number
+    call_1=1
+    call_line_2
+    Exit Sub
+  End If
+  If number <> 2000 Or 9000 Then
     Print Time$;header$;"Line 1 invalid extension";number
     call_1=1
     play_reorder
     Pause 5000
     Print Time$;header$;"Line 1 time out"
     play_silence
+    Exit Sub
   End If
 End Sub
 '
