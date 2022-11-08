@@ -1,4 +1,4 @@
-'PICAXE Basic bb_pbx_ringer.xml
+'PICAXE Basic bb_pbx_ringer
 
 
 symbol varA = w0
