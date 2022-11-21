@@ -15,11 +15,15 @@
 '         - Added cancel_call_extension_all sub
 '         - Reduced flash time from 250 to 100ms
 ' 3.22311 - Began working on the Switch Fabric (relays)
-'         - Added enable_extension sub
+'         - Added enable_extension sub for SLIC #1
+' 3.22324 - Added enable_extension sub for SLIC #2
+'         - Added set_path_a & set_path_b subs
+'         - Added logging to progress tones
 '
 Sub pbx3
-  header$=" BB_PBX-INFO-v3.22311- "
+  header$=" BB_PBX-INFO-v3.22324- "
   m_loop=0 'Counter for the main loop
+  pbx_uptime=0
   calls=0  'General call count
   
 ' General Variables
@@ -53,7 +57,9 @@ Sub pbx3
   SetPin 16, dout
   
 ' Assignment for Switch Fabric
-  SetPin 17, dout
+  SetPin 17, dout ' SLIC #1 enable relay
+  SetPin 18, dout ' SLIC #2 enable relay
+  SetPin 21, dout ' Path A/B relays
   
   Dim nums(10) ' number array for pulse digits
   
@@ -70,14 +76,18 @@ Sub pbx3
         process_call 'need to fix this Sub so it is by extension
       End If
 ' Extension has gone off hook from a ringing state
-      If hookstate(extension)=1 And call_state(extension)=0 and call_progress_tone=0 and ring_state(extension)=1 Then
+      If hookstate(extension)=1 And call_state(extension)=0 and call_progress_tone=1 and ring_state(extension)=1 Then
         Print Time$;header$;"Extension";extension;" answering call"
         cancel_call_extension_all ' changed 310
+        enable_extension(extension) ' added 324
         ring_state(extension)=0
         call_state(extension)=1
+        play_silence ' added 324
+        set_path_b                 ' added 324
       End If
 ' Extension has gone off hook but the tone generator is busy, so continue to loop
-      If hookstate(extension)=1 And call_state(extension)=0 and call_progress_tone=1 Then
+      If hookstate(extension)=1 And call_state(extension)=0 and call_progress_tone=1 and ring_state(extension)=0 Then
+        Print Time$;header$;"Extension";extension;" Can't Service Call - Tone Generator Busy"
         disable_extension(extension)
         flash(9)
       End if
@@ -87,6 +97,7 @@ Sub pbx3
         call_state(extension)=0
         disable_extension(extension)
         cancel_call_extension_all ' changed 310
+        set_path_a                ' added 324
         play_silence
         flash(9)
       End If
@@ -104,8 +115,9 @@ Sub pbx3
     
 ' Log activity every 10 minutes
     If m_loop=300 Then
-      Print Time$;header$;"Status - Call Count";calls
+      Print Time$;header$;"Status - Uptime";pbx_uptime;" Call Count";calls
       m_loop=0
+      pbx_uptime = pbx_uptime + 2 ' based on 300 loops is 2 minutes
     End If
     m_loop=m_loop+1
   Loop
@@ -125,13 +137,21 @@ End Sub
 Sub enable_extension(ext)
   If ext = 0 Then Exit Sub
   If ext = 1 Then Pin(17) = 1 'Turn on relay 1
-  If ext = 2 Then Pin(18) = 1 'Turn on relay 3
+  If ext = 2 Then Pin(18) = 1 'Turn on relay 4
 End Sub
 '
 Sub disable_extension(ext)
   If ext = 0 Then Exit Sub
   If ext = 1 Then Pin(17) = 0 'Turn off relay 1
-  If ext = 2 Then Pin(18) = 0 'Turn off relay 3
+  If ext = 2 Then Pin(18) = 0 'Turn off relay 4
+End Sub
+'
+Sub set_path_a
+  Pin(21)=0
+End Sub
+'
+Sub set_path_b
+  Pin(21)=1
 End Sub
 '
 Sub ring_line_1
@@ -187,7 +207,7 @@ Sub rotary2
       If needToPrint=1 Then
         nums(digits)=count Mod 10
         number=nums(1)*1000+nums(2)*100+nums(3)*10+nums(4)
-        Print Time$;header$;"Pulse Count";count Mod 10;" Number";number
+        Print Time$;header$;"Extension"; extension;" Pulse Count";count Mod 10;" Number";number
         digits=digits+1
         needToPrint=0
         count=0
@@ -260,6 +280,7 @@ Sub process_call
     calls=calls+1 ' increment calls to track call count
     call_state(extension) = 1
     call_extension(1)
+    play_ringing    'added 324
     ring_state(1)=1
     Exit Sub
   End If
@@ -268,6 +289,8 @@ Sub process_call
     calls=calls+1 ' increment calls to track call count
     call_state(extension) = 1
     call_extension(2)
+    enable_extension(2)  ' added 324
+    play_ringing ' added 324
     ring_state(2)=1
     Exit Sub
   End If
@@ -284,36 +307,43 @@ End Sub
 '
 Sub play_music
   Port(14,3)=6
+  Print Time$;header$;"Progress Tone - Music"
   call_progress_tone=1
 End Sub
 '
 Sub play_silence
   Port(14,3)=7
+  Print Time$;header$;"Progress Tone - Silence"
   call_progress_tone=0
 End Sub
 '
 Sub play_busy
   Port(14,3)=4
+  Print Time$;header$;"Progress Tone - Busy"
   call_progress_tone=1
 End Sub
 '
 Sub play_dailtone
   Port(14,3)=5
+  Print Time$;header$;"Progress Tone - Dialtone"
   call_progress_tone=1
 End Sub
 '
 Sub play_ringing
   Port(14,3)=2
+  Print Time$;header$;"Progress Tone - Ringing"
   call_progress_tone=1
 End Sub
 '
 Sub play_reorder
   Port(14,3)=3
+  Print Time$;header$;"Progress Tone - Reorder"
   call_progress_tone=1
 End Sub
 '
 Sub play_offhook
   Port(14,3)=1
+  Print Time$;header$;"Progress Tone - Offhook Signal"
   call_progress_tone=1
 End Sub
 '
