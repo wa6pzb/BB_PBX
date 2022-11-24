@@ -1,6 +1,6 @@
 # Documentation - Bread Board PBX (BB_PBX)
 
-This simple telephone Private Branch Exchange (PBX) is using ready made modules:
+This simple telephone Private Branch Exchange (PBX) uses ready made modules:
 
 * [Subscriber Line Interface Circuit (SLIC)](/docs/Ring_SLIC_Interface.pdf)
 * [PSTN Interface circuit](/docs/Ag2130-datasheet-low-cost-PSTN-interface.pdf)
