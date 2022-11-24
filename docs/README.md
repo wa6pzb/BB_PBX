@@ -15,3 +15,5 @@ The modules are connected to a Micromite PIC32 microcontroller that is running a
 ## Block Diagram
 
 ![Alt text](../images/BB-PBX.png?raw=true "Block Diagram")
+
+![Alt text](/docs/BB-PBX-Relay-Fabric.png "Fabric")
