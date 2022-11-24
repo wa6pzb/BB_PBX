@@ -21,8 +21,8 @@ An I/O extender could be used in the future.
 * Pulse rotary dialing
 * Two Extensions
 * One Public Switch Telephone Network port (to connect to the world)
-* Progress Tones presented to the two extensions
-* Extension can dial and ring each other by using an assigned number
+* Progress Tones presented to the two extensions (dialtone, ringing, etc.)
+* Extension can dial and ring each other by using an assigned extension number
 
 ## Block Diagram
 
