@@ -10,6 +10,7 @@ This simple telephone Private Branch Exchange (PBX) is using ready made modules:
 
 The modules are connected to a Micromite PIC32 microcontroller that is running an embedded BASIC called MMBasic.
 
+* Micromite - https://geoffg.net/micromite.html
 * [MMBASIC PIC32 Schematic](/docs/PIC32MX170F256B_drawing.jpeg)
 
 Due to the amount of I/O pins needed to control the modules the Micromite PIC32 microcontroller can support just two extentions (SLICs) and one PSTN module
