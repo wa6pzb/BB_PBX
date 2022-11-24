@@ -4,4 +4,4 @@ This is the construction of a simple telephone Private Branch Exchange (PBX) usi
 
 ## Block Diagram
 
-![Alt text](images/BB-PBX.png?raw=true "Block Diagram")
+![Alt text](../images/BB-PBX.png?raw=true "Block Diagram")
