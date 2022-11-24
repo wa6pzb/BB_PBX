@@ -8,10 +8,12 @@ This simple telephone Private Branch Exchange (PBX) uses ready made modules:
 * [DTMF decoder module](/docs/MT8870.jpg)
 * [Relay Board](/docs/4DPDT_Relay_board.jpeg) & [Schematic Drawing](/docs/4DPDT_Relay_board_schem.jpeg)
 
+
 The modules are connected to a Micromite PIC32 microcontroller that is running an embedded BASIC called MMBasic.
 
 * Micromite - https://geoffg.net/micromite.html
 * [MMBASIC PIC32 Schematic](/docs/PIC32MX170F256B_drawing.jpeg)
+* PICAXE 8 pin microcontroller ring generator
 
 Due to the amount of I/O pins needed to control the modules the Micromite PIC32 microcontroller can support just two extentions (SLICs) and one PSTN module.
 An I/O extender could be used in the future.
