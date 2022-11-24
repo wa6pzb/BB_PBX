@@ -13,8 +13,16 @@ The modules are connected to a Micromite PIC32 microcontroller that is running a
 * Micromite - https://geoffg.net/micromite.html
 * [MMBASIC PIC32 Schematic](/docs/PIC32MX170F256B_drawing.jpeg)
 
-Due to the amount of I/O pins needed to control the modules the Micromite PIC32 microcontroller can support just two extentions (SLICs) and one PSTN module
+Due to the amount of I/O pins needed to control the modules the Micromite PIC32 microcontroller can support just two extentions (SLICs) and one PSTN module.
+An I/O extender could be used in the future.
 
+## Features
+
+* Pulse rotary dialing
+* Two Extensions
+* One Public Switch Telephone Network port (to connect to the world)
+* Progress Tones presented to the two extensions
+* Extension can dial and ring each other by using an assigned number
 
 ## Block Diagram
 
