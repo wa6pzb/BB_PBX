@@ -27,6 +27,10 @@ An I/O extender could be used in the future.
 * Extension can dial and ring each other by using an assigned extension number
 * Simple ring generator using a PICAXE 8 pin microcontroller dedicated to each SLIC using only a single I/O pin and no software on the PIC32
 
+## Description
+
+..Add here ..
+
 ## Block Diagram
 
 ![Alt text](../images/BB-PBX.png?raw=true "Block Diagram")
