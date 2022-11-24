@@ -23,6 +23,7 @@ An I/O extender could be used in the future.
 * One Public Switch Telephone Network port (to connect to the world)
 * Progress Tones presented to the two extensions (dialtone, ringing, etc.)
 * Extension can dial and ring each other by using an assigned extension number
+* Simple ring generator using a PICAXE 8 pin microcontroller dedicated to each SLIC using only a single I/O pin and no software on the PIC32
 
 ## Block Diagram
 
