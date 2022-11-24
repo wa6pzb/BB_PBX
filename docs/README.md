@@ -16,4 +16,6 @@ The modules are connected to a Micromite PIC32 microcontroller that is running a
 
 ![Alt text](../images/BB-PBX.png?raw=true "Block Diagram")
 
+## Basic Switch Fabric
+
 ![Alt text](/docs/BB-PBX-Relay-Fabric.png "Fabric")
