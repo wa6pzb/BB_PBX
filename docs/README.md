@@ -2,7 +2,7 @@
 
 This simple telephone Private Branch Exchange (PBX) is using ready made modules:
 
-* (/docs/Ring_SLIC_Interface.pdf "Subscriber Line Interface Circuit (SLIC)")
+* [Subscriber Line Interface Circuit (SLIC)](/docs/Ring_SLIC_Interface.pdf)
 * PSTN Interface circuit
 * Audio WAV/MP3 players
 * DTMF decoder module
