@@ -29,7 +29,7 @@ An I/O extender could be used in the future.
 
 ## Description
 
-..Add here ..
+With two (2) SLICs and one (1) PSTN module the system is fairly simple. The SLICs have to be monitored by the microcontroller to detect when a phone goes offhook on one of the SLIC modules.
 
 ## Block Diagram
 
