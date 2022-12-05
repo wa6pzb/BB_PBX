@@ -19,9 +19,11 @@
 ' 3.22324 - Added enable_extension sub for SLIC #2
 '         - Added set_path_a & set_path_b subs
 '         - Added logging to progress tones
+' 3.22338 - Added subs for enable_pstn_loop & disable_pstn_loop
+'         - Added code to use PSTN module
 '
 Sub pbx3
-  header$=" BB_PBX-INFO-v3.22324- "
+  header$=" BB_PBX-INFO-v3.22338- "
   m_loop=0 'Counter for the main loop
   pbx_uptime=0
   calls=0  'General call count
@@ -45,10 +47,10 @@ Sub pbx3
   
 ' Assignment for SLIC I/O Pins
   SetPin 2, dout  'SLIC 1 Ringer RM
-  SetPin 3, dout  'SLIC 1 Ringer F/R
+  SetPin 3, dout  'SLIC 1 Ringer F/R - Not USED
   SetPin 4, din   'SLIC 1 Hook SHR
   SetPin 5, dout  'SLIC 2 Ringer RM
-  SetPin 6, dout  'SLIC 2 Ringer F/R
+  SetPin 6, dout  'SLIC 2 Ringer F/R - Not USED
   SetPin 7, din   'SLIC 2 Hook SHR
   
 ' Assignment for Audio Player I/O Pins
@@ -60,6 +62,9 @@ Sub pbx3
   SetPin 17, dout ' SLIC #1 enable relay
   SetPin 18, dout ' SLIC #2 enable relay
   SetPin 21, dout ' Path A/B relays
+  
+' Assingments for PSTN Module
+  SetPin 22, dout ' PSTN Module Loop Switch Control LSC
   
   Dim nums(10) ' number array for pulse digits
   
@@ -98,6 +103,7 @@ Sub pbx3
         disable_extension(extension)
         cancel_call_extension_all ' changed 310
         set_path_a                ' added 324
+        disable_pstn_loop         ' added 338
         play_silence
         flash(9)
       End If
@@ -144,6 +150,14 @@ Sub disable_extension(ext)
   If ext = 0 Then Exit Sub
   If ext = 1 Then Pin(17) = 0 'Turn off relay 1
   If ext = 2 Then Pin(18) = 0 'Turn off relay 4
+End Sub
+'
+Sub enable_pstn_loop
+  Pin(22)=1
+End Sub
+'
+Sub disable_pstn_loop
+  Pin(22)=0
 End Sub
 '
 Sub set_path_a
@@ -292,6 +306,13 @@ Sub process_call
     enable_extension(2)  ' added 324
     play_ringing ' added 324
     ring_state(2)=1
+    Exit Sub
+  End If
+If number=2000 Then
+    Print Time$;header$;"Extension";extension;" in call to number";number
+    calls=calls+1 ' increment calls to track call count
+    call_state(extension) = 1
+    enable_pstn_loop
     Exit Sub
   End If
   If number <> 3000 Or 9000 Then
