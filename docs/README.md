@@ -26,6 +26,7 @@ An I/O extender could be used in the future.
 * Progress Tones presented to the two extensions (dialtone, ringing, etc.)
 * Extension can dial and ring each other by using an assigned extension number
 * Simple ring generator using a PICAXE 8 pin microcontroller dedicated to each SLIC using only a single I/O pin and no software on the PIC32
+* FUTURE - PSTN module to connect to VOIP adapter to make/recieve calls over my VOIP service
 
 ## Description
 
