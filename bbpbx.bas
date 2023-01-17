@@ -22,8 +22,14 @@
 ' 3.22338 - Added subs for enable_pstn_loop & disable_pstn_loop
 '         - Added code to use PSTN module
 '
+' 3.23007 - Changed PSTN extension from 2000 to 1000 - basically flash hook now
+'
+' 3.23016 - Added IVR recording 0007.mp3 to SD Card and Sub play_ivr
+'         - PSTN Module Ring Signal assigned
+'         - Added to main loop get_ring_state Sub
+'
 Sub pbx3
-  header$=" BB_PBX-INFO-v3.22338- "
+  header$=" BB_PBX-INFO-v3.23016- "
   m_loop=0 'Counter for the main loop
   pbx_uptime=0
   calls=0  'General call count
@@ -64,9 +70,13 @@ Sub pbx3
   SetPin 21, dout ' Path A/B relays
   
 ' Assingments for PSTN Module
-  SetPin 22, dout ' PSTN Module Loop Switch Control LSC
+  SetPin 22, dout           ' PSTN Module Loop Switch Control LSC
+  SetPin 23, din, PULLUP    ' PSTN Module Ring Signal RS
   
   Dim nums(10) ' number array for pulse digits
+  
+' Initialize the SD Card audio play to silence
+  play_silence
   
 ' Main PBX loop
   Do
@@ -117,7 +127,16 @@ Sub pbx3
         flash(9)
       End If
     Next Extension
-' Insert Line finder loop for the CO PSTN line HERE
+'PSTN line check for ringing
+    get_ring_state
+    if ringstate=0 then
+      Print Time$;header$;"PSTN Line is ringing"
+      enable_pstn_loop 'test only
+      play_ivr ' test only
+      pause 10000
+      play_silence
+      disable_pstn_loop 
+    End If
     
 ' Log activity every 10 minutes
     If m_loop=300 Then
@@ -199,10 +218,10 @@ Sub call_line_2
   ring_line_2
 End Sub
 '
-Sub hook
+Sub pin_check
   Do
-    If Pin(17)=1 Then Print "Off Hook" Else Print "On Hook"
-    Pause 500
+    If Pin(23)=0 Then Print "Low" Else Print "High"
+    Pause 100
   Loop
 End Sub
 '
@@ -273,6 +292,10 @@ Sub get_hook_state
   hookstate(2)=Pin(7)
 End Sub
 '
+Sub get_ring_state
+  ringstate=Pin(23)
+End Sub
+'
 Sub get_number
   rotary2
 End Sub
@@ -308,7 +331,7 @@ Sub process_call
     ring_state(2)=1
     Exit Sub
   End If
-If number=2000 Then
+  If number=1000 Then
     Print Time$;header$;"Extension";extension;" in call to number";number
     calls=calls+1 ' increment calls to track call count
     call_state(extension) = 1
@@ -365,6 +388,12 @@ End Sub
 Sub play_offhook
   Port(14,3)=1
   Print Time$;header$;"Progress Tone - Offhook Signal"
+  call_progress_tone=1
+End Sub
+'
+Sub play_ivr
+  Port (14,3)=0
+  Print Time$;header$;"Progress Tone - IVR"
   call_progress_tone=1
 End Sub
 '
