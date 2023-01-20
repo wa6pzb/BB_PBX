@@ -27,9 +27,12 @@
 ' 3.23016 - Added IVR recording 0007.mp3 to SD Card and Sub play_ivr
 '         - PSTN Module Ring Signal assigned
 '         - Added to main loop get_ring_state Sub
-'
+  
+' 3.23019 - Added DTMF pin assignments
+'         - Added get_dtmf Sub
+  
 Sub pbx3
-  header$=" BB_PBX-INFO-v3.23016- "
+  header$=" BB_PBX-INFO-v3.23019- "
   m_loop=0 'Counter for the main loop
   pbx_uptime=0
   calls=0  'General call count
@@ -72,6 +75,9 @@ Sub pbx3
 ' Assingments for PSTN Module
   SetPin 22, dout           ' PSTN Module Loop Switch Control LSC
   SetPin 23, din, PULLUP    ' PSTN Module Ring Signal RS
+  
+' Assignments for DTMF Module
+  SetPin 24, din
   
   Dim nums(10) ' number array for pulse digits
   
@@ -130,12 +136,16 @@ Sub pbx3
 'PSTN line check for ringing
     get_ring_state
     if ringstate=0 then
-      Print Time$;header$;"PSTN Line is ringing"
+      Print Time$;header$;"PSTN Line ring detected"
       enable_pstn_loop 'test only
+      Print Time$;header$;"PSTN Line seized"
+      pause 1000
       play_ivr ' test only
-      pause 10000
+      get_dtmf
+      pause 100
       play_silence
-      disable_pstn_loop 
+      disable_pstn_loop
+      Print Time$;header$;"PSTN Line released"
     End If
     
 ' Log activity every 10 minutes
@@ -220,7 +230,7 @@ End Sub
 '
 Sub pin_check
   Do
-    If Pin(23)=0 Then Print "Low" Else Print "High"
+    If Pin(24)=0 Then Print "Low" Else Print "High"
     Pause 100
   Loop
 End Sub
@@ -298,6 +308,21 @@ End Sub
 '
 Sub get_number
   rotary2
+End Sub
+'
+Sub get_dtmf
+  Timer =0
+  Do
+    tone_detect=Pin(24)
+    IF tone_detect = 1 then
+      Print Time$;header$;"DTMF Tone detected"
+      pause 100
+    End If
+    If Timer >= 30000 Then
+      Print Time$;header$;"DTMF detect timeout"
+      Exit Sub
+    End If
+  Loop
 End Sub
 '
 Sub process_call
