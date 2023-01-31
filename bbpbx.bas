@@ -30,9 +30,13 @@
   
 ' 3.23019 - Added DTMF pin assignments
 '         - Added get_dtmf Sub
-  
+'
+' 3.23030 - Added PSTN module loop current LC pin
+'         - Cleaned up comments
+'         - Added new code to get_dtmf to route call to extension 1 if dtmf detected
+'         - Added sub get_pstn_hook_state
 Sub pbx3
-  header$=" BB_PBX-INFO-v3.23019- "
+  header$=" BB_PBX-INFO-v3.23030- "
   m_loop=0 'Counter for the main loop
   pbx_uptime=0
   calls=0  'General call count
@@ -75,6 +79,7 @@ Sub pbx3
 ' Assingments for PSTN Module
   SetPin 22, dout           ' PSTN Module Loop Switch Control LSC
   SetPin 23, din, PULLUP    ' PSTN Module Ring Signal RS
+  SetPin 25, din            ' PSTN Module Loop Current LC
   
 ' Assignments for DTMF Module
   SetPin 24, din
@@ -93,8 +98,8 @@ Sub pbx3
         Print Time$;header$;"Extension";extension;" offhook"
         enable_extension(extension)
         play_dailtone
-        get_number 'need to fix this Sub so it is by extension
-        process_call 'need to fix this Sub so it is by extension
+        get_number
+        process_call
       End If
 ' Extension has gone off hook from a ringing state
       If hookstate(extension)=1 And call_state(extension)=0 and call_progress_tone=1 and ring_state(extension)=1 Then
@@ -103,8 +108,13 @@ Sub pbx3
         enable_extension(extension) ' added 324
         ring_state(extension)=0
         call_state(extension)=1
-        play_silence ' added 324
-        set_path_b                 ' added 324
+        play_silence
+        get_pstn_hook_state    'check that the external pstn line is still active
+        If hookstate(3)=1 then
+          set_path_a
+        Else
+          set_path_b          ' path b if extension to extension call
+        end if
       End If
 ' Extension has gone off hook but the tone generator is busy, so continue to loop
       If hookstate(extension)=1 And call_state(extension)=0 and call_progress_tone=1 and ring_state(extension)=0 Then
@@ -137,15 +147,12 @@ Sub pbx3
     get_ring_state
     if ringstate=0 then
       Print Time$;header$;"PSTN Line ring detected"
+      pause 4000     'let ring to get caller ID on phones
       enable_pstn_loop 'test only
       Print Time$;header$;"PSTN Line seized"
       pause 1000
       play_ivr ' test only
       get_dtmf
-      pause 100
-      play_silence
-      disable_pstn_loop
-      Print Time$;header$;"PSTN Line released"
     End If
     
 ' Log activity every 10 minutes
@@ -230,7 +237,7 @@ End Sub
 '
 Sub pin_check
   Do
-    If Pin(24)=0 Then Print "Low" Else Print "High"
+    If Pin(25)=0 Then Print "Low" Else Print "High"
     Pause 100
   Loop
 End Sub
@@ -302,6 +309,10 @@ Sub get_hook_state
   hookstate(2)=Pin(7)
 End Sub
 '
+Sub get_pstn_hook_state
+  hookstate(3)=Pin(25)
+End Sub
+'
 Sub get_ring_state
   ringstate=Pin(23)
 End Sub
@@ -314,12 +325,22 @@ Sub get_dtmf
   Timer =0
   Do
     tone_detect=Pin(24)
-    IF tone_detect = 1 then
+    IF tone_detect = 1 and hookstate(1)=0 And call_state(1)=0 then
       Print Time$;header$;"DTMF Tone detected"
-      pause 100
+      Print Time$;header$;"Ringing Extension 1 for external call"
+      calls=calls+1 ' increment calls to track call count
+'call_state(1) = 1
+      call_extension(1)
+      play_ringing
+      ring_state(1)=1
+      exit sub
     End If
     If Timer >= 30000 Then
       Print Time$;header$;"DTMF detect timeout"
+      pause 100
+      play_silence
+      disable_pstn_loop
+      Print Time$;header$;"PSTN Line released"
       Exit Sub
     End If
   Loop
